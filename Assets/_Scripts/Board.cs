@@ -8,8 +8,9 @@ public class Board : MonoBehaviour
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject[] Dots;
     private TileBackground[,] gems;
-    private GameObject[,] AllDotsInTheMatch;
-
+    public int Width => width;
+    public int Height => height;
+    public GameObject[,] AllDotsInTheMatch;
 
     private void Start()
     {
@@ -34,6 +35,11 @@ public class Board : MonoBehaviour
                 dot.transform.parent = this.transform;
                 dot.name = $"({x}, {y})";
                 AllDotsInTheMatch[x, y] = dot;
+                Dot dotScript = dot.GetComponent<Dot>();
+                dotScript.column = x;
+                dotScript.row = y;
+                dotScript.board = this;
+
             }
         }
     }
