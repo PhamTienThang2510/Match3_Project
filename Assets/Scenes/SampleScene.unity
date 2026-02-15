@@ -224,7 +224,7 @@ GameObject:
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -242,9 +242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Board
   width: 5
   height: 5
-  ListGemPrefabs:
-  - {fileID: 3177297082672112759, guid: 78ebdea169f3f894ab2e89a86e36182f, type: 3}
-  - {fileID: 8963048200227096117, guid: 4a0c5b9e1e4387e4484a5046fc9110f8, type: 3}
+  tilePrefab: {fileID: 8773252280853620449, guid: 83cf6051c481cf04e85d0ec03efb005f, type: 3}
 --- !u!4 &677547146
 Transform:
   m_ObjectHideFlags: 0
