@@ -2,15 +2,17 @@ using UnityEngine;
 
 public class TileBackground : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    [SerializeField] private GameObject[] Dots;
+    private void Start()
     {
-        
+        Initialized();
+    }
+    private void Initialized()
+    {
+        int randomDot = Random.Range(0, Dots.Length);
+        GameObject dot = Instantiate(Dots[randomDot], transform.position, Quaternion.identity, transform) as GameObject;
+        dot.transform.parent = this.transform;
+        dot.name = this.gameObject.name;
     }
 }

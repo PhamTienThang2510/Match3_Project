@@ -22,7 +22,10 @@ public class Board : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-              Instantiate(tilePrefab, new Vector3(x, y, 0), Quaternion.identity, transform);
+                Vector2 PosTemp = new Vector2(x, y);
+                GameObject TileBackground = Instantiate(tilePrefab, PosTemp, Quaternion.identity, transform) as GameObject;
+                TileBackground.transform.parent = this.transform;
+                TileBackground.name = $"({x}, {y})";
             }
         }
     }

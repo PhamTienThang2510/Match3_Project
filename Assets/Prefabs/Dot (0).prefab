@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8773252280853620449
+--- !u!1 &476868446080898049
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,39 +8,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 308783199305604902}
-  - component: {fileID: 8418476013702808129}
-  - component: {fileID: -1171783005708636648}
+  - component: {fileID: 4249239531061044016}
+  - component: {fileID: 8751517825193262763}
   m_Layer: 0
-  m_Name: Tile Background
+  m_Name: Dot (0)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &308783199305604902
+--- !u!4 &4249239531061044016
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8773252280853620449}
+  m_GameObject: {fileID: 476868446080898049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &8418476013702808129
+--- !u!212 &8751517825193262763
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8773252280853620449}
-  m_Enabled: 0
+  m_GameObject: {fileID: 476868446080898049}
+  m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -80,8 +79,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 7bac42d264bf1ae44bdb8a4237c1e7a0, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 36e384abebdacc141a48b45b28c73c4f, type: 3}
+  m_Color: {r: 0.16862746, g: 0.21568629, b: 0.29411766, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -91,22 +90,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-1171783005708636648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8773252280853620449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebfc9b7d82b1ca54bbbc58e2eecd4be2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TileBackground
-  Dots:
-  - {fileID: 476868446080898049, guid: b1053b6432291504e82dc4683708af53, type: 3}
-  - {fileID: 2696839790227696224, guid: bf80a4d7a8ec31c4c8ee836d57bc7a0b, type: 3}
-  - {fileID: 8609684334789564152, guid: c98c876402e6ce84c9ae58409a5af539, type: 3}
-  - {fileID: 8061734739142904494, guid: 0860c9256a7f255439eb8d036237f4d5, type: 3}
-  - {fileID: 1761481571485392626, guid: fca44904a7c807a49bd7ca64311c1e48, type: 3}
-  - {fileID: 4668655096091000864, guid: 72c862af1bf14684bb371bf6dd9c2ec5, type: 3}
