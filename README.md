@@ -236,6 +236,3 @@ Add your preferred license (MIT recommended for portfolio projects).
 
 ---
 
-
-
-Chọn 1 style, mình build lại bản nâng cấp cho bạn.
