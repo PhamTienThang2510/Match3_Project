@@ -12,16 +12,22 @@ public class Dot : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!board.CanMove) return;
+        if (board == null || !board.CanMove) return;
+        if (Camera.main == null) return;
 
-        firstTouch = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        world.z = 0f;
+        firstTouch = world;
     }
 
     private void OnMouseUp()
     {
-        if (!board.CanMove) return;
+        if (board == null || !board.CanMove) return;
+        if (Camera.main == null) return;
 
-        lastTouch = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        world.z = 0f;
+        lastTouch = world;
         CalculateSwipe();
     }
 
