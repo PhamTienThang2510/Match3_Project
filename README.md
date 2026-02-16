@@ -1,9 +1,3 @@
-Dưới đây là một phiên bản **README.md chuyên nghiệp**, tối ưu để đưa lên GitHub và gắn vào CV intern Unity Dev.
-Nội dung viết theo hướng clean, technical, rõ kiến trúc — phù hợp portfolio.
-
-Bạn có thể copy nguyên khối này vào `README.md`.
-
----
 
 # 🎮 Match-3 Prototype (Unity)
 
