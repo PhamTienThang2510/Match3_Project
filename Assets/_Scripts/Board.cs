@@ -18,16 +18,12 @@ public class Board : MonoBehaviour
 
     public GameObject[,] AllDotsInTheBoard;
 
-    private GameManager gameManager;
 
     private void Start()
     {
         AllDotsInTheBoard = new GameObject[width, height];
         SetUpBoard();
         SetUpCamera();
-
-        // cache GameManager to report score/time when matches happen
-        gameManager = FindObjectOfType<GameManager>();
     }
 
     #region Setup
@@ -219,8 +215,8 @@ public class Board : MonoBehaviour
                 totalPoints += pointsForRun;
             }
 
-            if (totalPoints > 0 && gameManager != null)
-                gameManager.AddPoints(totalPoints);
+            if (totalPoints > 0)
+                GameManager.Instance.AddPoints(totalPoints);
 
             // collect unique dots to destroy
             HashSet<GameObject> uniqueMatches = new HashSet<GameObject>();
