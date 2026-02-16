@@ -243,7 +243,7 @@ MonoBehaviour:
   width: 5
   height: 5
   tilePrefab: {fileID: 8773252280853620449, guid: 83cf6051c481cf04e85d0ec03efb005f, type: 3}
-  Dots:
+  dots:
   - {fileID: 476868446080898049, guid: b1053b6432291504e82dc4683708af53, type: 3}
   - {fileID: 2696839790227696224, guid: bf80a4d7a8ec31c4c8ee836d57bc7a0b, type: 3}
   - {fileID: 8609684334789564152, guid: c98c876402e6ce84c9ae58409a5af539, type: 3}

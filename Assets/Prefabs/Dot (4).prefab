@@ -104,7 +104,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5b8a7ae6d7b37942b7315ea3b8f33f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dot
-  SwipeAngle: 0
+  column: 0
+  row: 0
+  board: {fileID: 0}
+  DotType: 4
 --- !u!58 &6094686504232240464
 CircleCollider2D:
   m_ObjectHideFlags: 0

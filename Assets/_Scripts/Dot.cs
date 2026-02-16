@@ -5,6 +5,7 @@ public class Dot : MonoBehaviour
     [HideInInspector] public int column;
     [HideInInspector] public int row;
     [HideInInspector] public Board board;
+    public int dotType;
 
     private Vector2 firstTouch;
     private Vector2 lastTouch;
