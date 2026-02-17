@@ -10,6 +10,24 @@ public class Board : MonoBehaviour
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
     [SerializeField] private GameObject[] dots;
+    [SerializeField] private float HintDelay = 5f;
+    [SerializeField] private int maxShuffleAttempts = 10;
+
+    [Header("Hint Settings")]
+    [Tooltip("Strength (world units) of the shake hint on X axis")]
+    [SerializeField] private float hintShakeStrength = 0.2f;
+    [Tooltip("Vibrato (number of shakes)")]
+    [SerializeField] private int hintVibrato = 10;
+    [Tooltip("Duration for one shake cycle in seconds")]
+    [SerializeField] private float hintCycleDuration = 0.5f;
+    [Tooltip("Scale pulse amount while hinting")]
+    [SerializeField] private float hintScale = 1.15f;
+    [Tooltip("Scale pulse duration")]
+    [SerializeField] private float hintScaleDuration = 0.25f;
+
+    private readonly Vector3 baseScale = new Vector3(0.8f, 0.8f, 0.8f);
+
+    private float hintTimer = 0f;
 
     public int Width => width;
     public int Height => height;
@@ -18,6 +36,13 @@ public class Board : MonoBehaviour
 
     public GameObject[,] AllDotsInTheBoard;
 
+    // hint runtime state
+    private Tween hintTweenA;
+    private Tween hintTweenB;
+    private Tween hintScaleTweenA;
+    private Tween hintScaleTweenB;
+    private GameObject hintA;
+    private GameObject hintB;
 
     private void Start()
     {
@@ -26,8 +51,19 @@ public class Board : MonoBehaviour
         SetUpCamera();
     }
 
-    #region Setup
+    private void Update()
+    {
+        if (!CanMove) return;
+        hintTimer += Time.deltaTime;
+        if (hintTimer >= HintDelay)
+        {
+            hintTimer = 0f;
+            ShowHint();
+        }
+    }
 
+    #region Setup
+    // this method initializes the board with random dots, ensuring no initial matches of 3 or more in a row/column.
     private void SetUpBoard()
     {
         for (int x = 0; x < width; x++)
@@ -53,6 +89,9 @@ public class Board : MonoBehaviour
                 dotScript.row = y;
                 dotScript.board = this;
                 dotScript.dotType = randomDot;
+
+                // ensure consistent base scale
+                dot.transform.localScale = baseScale;
 
                 AllDotsInTheBoard[x, y] = dot;
             }
@@ -119,15 +158,20 @@ public class Board : MonoBehaviour
         int dy = Mathf.Abs(row1 - row2);
         if (dx + dy != 1) return;
 
+        // stop any hint while player is about to move
+        StopHint();
+
         StartCoroutine(SwapWithAnimation(col1, row1, col2, row2));
     }
 
+    // Helper to check if given coordinates are within board bounds
     private bool IsInsideBoard(int col, int row)
     {
         return col >= 0 && col < width &&
                row >= 0 && row < height;
     }
 
+    // This coroutine handles the visual swap animation, checks for matches, and reverts if no matches are created.
     private IEnumerator SwapWithAnimation(int col1, int row1, int col2, int row2)
     {
         CanMove = false;
@@ -151,6 +195,10 @@ public class Board : MonoBehaviour
         Sequence seq = DOTween.Sequence();
         seq.Join(dot1.transform.DOMove(pos2, duration).SetEase(Ease.OutQuad));
         seq.Join(dot2.transform.DOMove(pos1, duration).SetEase(Ease.OutQuad));
+
+        // play swap sound when animation begins (if AudioManager present)
+        AudioManager.Instance?.PlaySwap();
+
         yield return seq.WaitForCompletion();
 
         // Swap in array
@@ -197,6 +245,7 @@ public class Board : MonoBehaviour
         // If there are matches, process them
         yield return StartCoroutine(CheckAndProcessMatches());
         CanMove = true;
+        hintTimer = 0f; // reset hint timer after a successful move
     }
 
     private IEnumerator CheckAndProcessMatches()
@@ -369,7 +418,9 @@ public class Board : MonoBehaviour
                     unique.Add(d);
         return unique.ToList();
     }
+    #endregion
 
+    #region Match Processing
     private IEnumerator DestroyMatches(List<GameObject> matches)
     {
         foreach (GameObject dot in matches)
@@ -388,6 +439,7 @@ public class Board : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
     }
+
     private IEnumerator CollapseBoard()
     {
         for (int x = 0; x < width; x++)
@@ -421,6 +473,7 @@ public class Board : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
     }
+
     private IEnumerator RefillBoard()
     {
         for (int x = 0; x < width; x++)
@@ -440,6 +493,8 @@ public class Board : MonoBehaviour
                     dotScript.board = this;
                     dotScript.dotType = randomDot;
 
+                    dot.transform.localScale = baseScale;
+
                     AllDotsInTheBoard[x, y] = dot;
 
                     dot.transform
@@ -451,7 +506,201 @@ public class Board : MonoBehaviour
 
         yield return new WaitForSeconds(0.4f);
     }
+    #endregion
 
+    #region Hints
+    private void ShowHint()
+    {
+        // stop any previous hint first
+        StopHint();
+
+        // find possible moves
+        var possible = FindPossibleMoves();
+
+        if (possible == null || possible.Count == 0)
+        {
+            // no possible moves -> shuffle/reshuffle board
+            StartCoroutine(ShuffleBoard());
+            return;
+        }
+
+        // show a shaking hint for the first possible move (two tiles)
+        var firstMove = possible[0];
+        if (firstMove == null || firstMove.Count < 2) return;
+
+        GameObject a = firstMove[0];
+        GameObject b = firstMove[1];
+        if (a == null || b == null) return;
+
+        hintA = a;
+        hintB = b;
+
+        // DOShakePosition with X-axis strength only; loops until StopHint is called
+        hintTweenA = a.transform.DOShakePosition(hintCycleDuration, new Vector3(hintShakeStrength, 0f, 0f), hintVibrato, 0f, false, true)
+            .SetLoops(-1, LoopType.Restart);
+        hintTweenB = b.transform.DOShakePosition(hintCycleDuration, new Vector3(hintShakeStrength, 0f, 0f), hintVibrato, 0f, false, true)
+            .SetLoops(-1, LoopType.Restart);
+
+        // optional small scale pulse in parallel
+        hintScaleTweenA = a.transform.DOScale(hintScale, hintScaleDuration).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+        hintScaleTweenB = b.transform.DOScale(hintScale, hintScaleDuration).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+    }
+
+    private void StopHint()
+    {
+        // kill tweens (if any)
+        if (hintTweenA != null) { hintTweenA.Kill(); hintTweenA = null; }
+        if (hintTweenB != null) { hintTweenB.Kill(); hintTweenB = null; }
+        if (hintScaleTweenA != null) { hintScaleTweenA.Kill(); hintScaleTweenA = null; }
+        if (hintScaleTweenB != null) { hintScaleTweenB.Kill(); hintScaleTweenB = null; }
+
+        // Reset ONLY the two hinted tiles to their grid positions and base scale.
+        if (hintA != null)
+        {
+            var da = hintA.GetComponent<Dot>();
+            if (da != null)
+            {
+                hintA.transform.position = new Vector3(da.column, da.row, 0f);
+            }
+            hintA.transform.localScale = baseScale;
+            hintA = null;
+        }
+
+        if (hintB != null)
+        {
+            var db = hintB.GetComponent<Dot>();
+            if (db != null)
+            {
+                hintB.transform.position = new Vector3(db.column, db.row, 0f);
+            }
+            hintB.transform.localScale = baseScale;
+            hintB = null;
+        }
+    }
+
+    private List<List<GameObject>> FindPossibleMoves()
+    {
+        List<List<GameObject>> possibleMoves = new List<List<GameObject>>();
+
+        // iterate every cell and try swapping with right and up neighbor (avoids duplicates)
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                GameObject current = AllDotsInTheBoard[x, y];
+                if (current == null) continue;
+
+                // right neighbor
+                if (x + 1 < width && AllDotsInTheBoard[x + 1, y] != null)
+                {
+                    SwapDotTypes(x, y, x + 1, y);
+                    var runs = FindMatchRuns();
+                    if (runs.Count > 0)
+                        possibleMoves.Add(new List<GameObject> { AllDotsInTheBoard[x, y], AllDotsInTheBoard[x + 1, y] });
+                    SwapDotTypes(x, y, x + 1, y); // swap back
+                }
+
+                // up neighbor
+                if (y + 1 < height && AllDotsInTheBoard[x, y + 1] != null)
+                {
+                    SwapDotTypes(x, y, x, y + 1);
+                    var runs = FindMatchRuns();
+                    if (runs.Count > 0)
+                        possibleMoves.Add(new List<GameObject> { AllDotsInTheBoard[x, y], AllDotsInTheBoard[x, y + 1] });
+                    SwapDotTypes(x, y, x, y + 1); // swap back
+                }
+            }
+        }
+
+        return possibleMoves;
+    }
+
+    // swap only the dotType values for a quick simulation (keeps GameObjects in-place)
+    private void SwapDotTypes(int x1, int y1, int x2, int y2)
+    {
+        var a = AllDotsInTheBoard[x1, y1];
+        var b = AllDotsInTheBoard[x2, y2];
+        if (a == null || b == null) return;
+
+        var da = a.GetComponent<Dot>();
+        var db = b.GetComponent<Dot>();
+        int tmp = da.dotType;
+        da.dotType = db.dotType;
+        db.dotType = tmp;
+    }
+
+    private IEnumerator ShuffleBoard()
+    {
+        // ensure hint stopped while shuffling
+        StopHint();
+
+        // prevent input while shuffling
+        CanMove = false;
+
+        int attempts = 0;
+        bool foundMove = false;
+
+        while (attempts < maxShuffleAttempts && !foundMove)
+        {
+            attempts++;
+
+            // Collect all existing GameObjects
+            List<GameObject> all = new List<GameObject>();
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                    if (AllDotsInTheBoard[x, y] != null)
+                        all.Add(AllDotsInTheBoard[x, y]);
+
+            // Fisher-Yates shuffle the list
+            for (int i = all.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                var tmp = all[i];
+                all[i] = all[j];
+                all[j] = tmp;
+            }
+
+            // Reassign shuffled objects back to board and animate to new positions
+            int index = 0;
+            Sequence seq = DOTween.Sequence();
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    var obj = all[index++];
+                    AllDotsInTheBoard[x, y] = obj;
+                    Dot ds = obj.GetComponent<Dot>();
+                    ds.column = x;
+                    ds.row = y;
+                    seq.Join(obj.transform.DOMove(new Vector2(x, y), 0.25f).SetEase(Ease.OutQuad));
+                }
+            }
+
+            yield return seq.WaitForCompletion();
+
+            // give a frame to settle then check for possible moves
+            yield return null;
+            var possible = FindPossibleMoves();
+            if (possible != null && possible.Count > 0)
+                foundMove = true;
+        }
+
+        // if we still didn't find a move after attempts, as a fallback reinitialize board
+        if (!foundMove)
+        {
+            // destroy existing and rebuild
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                    if (AllDotsInTheBoard[x, y] != null)
+                        Destroy(AllDotsInTheBoard[x, y]);
+
+            AllDotsInTheBoard = new GameObject[width, height];
+            SetUpBoard();
+        }
+
+        CanMove = true;
+        hintTimer = 0f;
+    }
     #endregion
 
     // Exposed method so GameManager can enable/disable input
