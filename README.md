@@ -1,238 +1,284 @@
+🎮 Match-3 Puzzle Game (Unity)
 
-# 🎮 Match-3 Prototype (Unity)
+A configurable grid-based Match-3 puzzle game built with Unity.
+Includes animated swaps, combo chains, hint system, shuffle logic, timer-based gameplay, scoring, and audio support.
 
-A small but fully functional **Match-3 game prototype** built with Unity.
-The project focuses on clean board logic, match detection, scoring rules, and time-based gameplay mechanics.
+✨ Features
+🎯 Core Gameplay
 
-> Swap adjacent tiles to form matches.
-> Matches grant points and bonus time.
-> When the timer reaches zero — the game ends.
+Grid-based match-3 board with configurable width and height (Board.cs).
 
----
+Random board initialization that avoids immediate 3+ matches.
 
-## 🚀 Features
+Smooth animated swaps using DOTween.
 
-* Standard match-3 grid with gravity and refill
-* Drag / swipe input handling per tile
-* Horizontal & vertical match detection (supports T/L overlaps)
-* Scoring system based on run length
-* Time bonus system tied to scoring
-* Combo chaining (auto re-check after refill)
-* Tweened animations using DOTween
-* Simple Pause & Game Over UI
-* Inspector-configurable gameplay parameters
+Swap validation with automatic revert if no match is produced.
 
----
+🧩 Tile / Piece System
 
-## 🧠 Gameplay Rules
+Tile prefab system with multiple types (Dot.dotType).
 
-* Swap two adjacent tiles (horizontal or vertical).
-* A contiguous run of **N** tiles of the same type yields:
+Mouse / touch swipe input to select and swap tiles.
 
-```
-Points = N - 2
-```
+Adjacency validation before swap attempt (Board.TrySwap).
 
-Examples:
+🔄 Matching, Combos & Scoring
 
-* 3 in a row → 1 point
+Detects horizontal and vertical runs of ≥ 3 (FindMatchRuns()).
 
-* 4 in a row → 2 points
+Supports chain reactions (combos).
 
-* 5 in a row → 3 points
+Scoring system:
 
-* T- or L-shaped matches count as multiple runs.
+3 tiles → 1 point
 
-* Each point grants a time bonus:
+4 tiles → 2 points
 
-```
-Time bonus = points × timeBonusPerPoint
-```
+5 tiles → 3 points
 
-* The timer counts down from `initialTime`.
-* When time reaches zero → Game Over.
+Time bonus per point (configurable in GameManager).
 
----
+Points added via GameManager.AddPoints().
 
-## 🏗 Project Architecture
+🧱 Board Maintenance
 
-### 📁 Assets/_Scripts/Board.cs
+Removes matched tiles (DestroyMatches()).
 
-Core gameplay controller.
+Collapses columns (falling tiles).
 
-Responsibilities:
+Refills empty cells with new random tiles.
 
-* Board initialization
-* Swap validation and animation
-* Match detection
-* Destruction
-* Collapse (gravity system)
-* Refill logic
-* Combo chain processing
-* Reporting points to GameManager
+Shuffle system when no possible moves are found.
 
-Uses:
+Fallback full board rebuild after several failed shuffle attempts.
 
-* Coroutine state flow
-* 2D grid array (GameObject[,])
-* DOTween for animation
+💡 Hint System / UX
 
----
+Automatic hint system after inactivity.
 
-### 📁 Assets/_Scripts/Dot.cs
+Finds possible moves and animates two tiles (shake + scale pulse).
 
-Per-tile behavior.
+Hint timer resets after successful move.
 
-Responsibilities:
+Shake animation restricted to X-axis for clear visual feedback.
 
-* Stores logical position (row, column)
-* Stores tile type
-* Handles pointer input
-* Computes swipe direction
-* Requests swap from Board
+⏱ Game Flow & UI
 
----
+Timer-based gameplay:
 
-### 📁 Assets/_Scripts/GameManager.cs
+initialTime
 
-Game state controller.
+maxTime
 
-Responsibilities:
+Countdown system
 
-* Score tracking
-* Timer countdown
-* Pause handling
-* Game Over handling
-* UI updates
-* Adds time bonus when scoring
+Time bonus added when scoring.
 
-Exposed method:
+Pause / Resume system.
 
-```
-AddPoints(int amount)
-```
+Game Over handling.
 
----
+Restart support.
 
-## ⚙ Inspector Configuration
+UI integrated with TextMeshPro (TextMeshProUGUI).
 
-### Board Component
+🔊 Audio
 
-* `width`, `height` — board dimensions
-* `dots` — tile prefab array
+AudioManager Singleton.
 
----
+Background music (loop).
 
-### GameManager Component
+Swap SFX (plays only on successful swap).
 
-* `initialTime`
-* `maxTime`
-* `timeBonusPerPoint`
-* `pointsText`
-* `timeText`
-* `pausePanel`
-* `gameOverPanel`
+Volume controls & mute toggle.
 
-If Board reference is not manually assigned, it will auto-find at runtime.
+Fade in / fade out support (if enabled).
 
----
+🏗 Architecture
 
-## 🌀 Game Loop Flow
+Singleton pattern for:
 
-```
-Player Swipe
-    ↓
-Validate Swap
-    ↓
-Animate Swap
-    ↓
-Check Matches
-    ↓
-If No Match → Revert
-If Match →
-    Destroy
-    Collapse
-    Refill
-    Re-check (Combo Chain)
-    ↓
-Return to Idle
-```
+GameManager
 
----
+AudioManager
 
-## 🧩 Dependencies
+Inspector-exposed serialized fields for easy tuning.
 
-* DOTween (Demigiant)
-* TextMeshPro (Unity Package)
-* Main Camera must be tagged: `MainCamera`
+DOTween used for:
 
----
+Swap animations
 
-## 🛠 How to Run
+Falling tiles
 
-1. Open project in Unity Editor.
-2. Ensure DOTween is installed and initialized.
-3. Verify prefab and UI references in Inspector.
-4. Press Play.
+Hint shake & scale
 
-### Debug with Visual Studio 2022
+Shuffle animations
 
-* Open `Assembly-CSharp.sln`
-* Debug → Start Debugging (F5)
+📁 Important Files
+Board.cs
 
----
+Handles:
 
-## 🧪 Implemented Mechanics
+Board creation
 
-* Initial board generation avoids starting matches.
-* Manhattan-distance swap validation.
-* Match detection with horizontal & vertical runs.
-* T/L overlaps handled correctly via Distinct match filtering.
-* Combo chain logic via recursive coroutine.
-* Time bonus clamped by `maxTime`.
+Swap logic
 
----
+Match detection
 
-## 🔮 Possible Extensions
+Collapse & refill
 
-* Special tiles (bomb, line clear, color bomb)
-* Combo multiplier system
-* Highscore persistence
-* Particle & floating score feedback
-* Object pooling for performance
-* ScriptableObject tile definitions
-* Unit tests for match detection logic
+Shuffle
 
----
+Hint system
 
-## 💡 Technical Highlights (For Recruiters)
+Dot.cs
 
-* Clean separation between Board logic and GameManager state
-* Coroutine-based state machine
-* Deterministic match detection algorithm
-* Grid-based data model (2D array)
-* Tween-driven animation system
-* Configurable gameplay via Inspector
+Handles:
 
----
+Tile behavior
 
-## 🎯 Purpose of This Project
+Swipe input detection
 
-This prototype demonstrates:
+Swap requests
 
-* Understanding of grid-based game architecture
-* Coroutine flow control
-* Gameplay state management
-* Animation integration (DOTween)
-* Clean code structure suitable for extension
+GameManager.cs
 
-Designed as a foundational system that can scale into a production-ready Match-3 framework.
+Handles:
 
----
+Score system
 
-## 📜 License
+Timer logic
 
-Add your preferred license (MIT recommended for portfolio projects).
+Pause / Resume
 
----
+Game Over
 
+UI bindings
+
+AudioManager.cs
+
+Handles:
+
+Background music
+
+Swap SFX
+
+Volume & mute
+
+Fade effects
+
+📦 Requirements / Dependencies
+
+Unity (Specify your Unity Editor version here)
+
+DOTween (for animations)
+
+TextMeshPro (for UI text)
+
+Audio files (e.g., background.ogg, swap.ogg)
+
+Tile prefabs assigned in Inspector
+
+🚀 Quick Start
+
+Open the project in Unity.
+
+Install DOTween (if not already installed).
+
+Open the main gameplay scene.
+
+Assign:
+
+Tile prefabs to Board
+
+UI references to GameManager
+
+Audio clips to AudioManager
+
+Press Play.
+
+🎮 Controls
+
+Click / Tap a tile and swipe to swap.
+
+Swap must be adjacent.
+
+Esc key toggles Pause.
+
+⚙ Configuration (Inspector Tuning)
+Board
+
+Width / Height
+
+HintDelay
+
+Hint shake strength
+
+Hint scale amount
+
+Swap animation duration
+
+Fall duration
+
+Max shuffle attempts
+
+GameManager
+
+Initial time
+
+Max time
+
+Time bonus per point
+
+UI references
+
+AudioManager
+
+Music volume
+
+SFX volume
+
+Background clip
+
+Swap clip
+
+🧮 Scoring & Time Bonus Logic
+
+For each match:
+
+Points = (MatchedTiles - 2)
+
+
+Example:
+
+3 tiles → 1 point
+
+4 tiles → 2 points
+
+5 tiles → 3 points
+
+Time bonus is applied per point earned.
+
+⚠ Known Limitations / TODO
+
+No special tiles (bomb, striped, etc.) yet.
+
+No visual particle effects on match.
+
+No persistent save system.
+
+No level progression system.
+
+🏆 Credits
+
+Developed using:
+
+Unity Engine
+
+DOTween
+
+TextMeshPro
+
+📜 License
+
+Specify your license here (MIT / Personal / Educational / etc.)
