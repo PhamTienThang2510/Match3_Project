@@ -85,10 +85,10 @@ public class Board : MonoBehaviour
 
                 GameObject dot = Instantiate(dots[randomDot], pos, Quaternion.identity, transform);
                 Dot dotScript = dot.GetComponent<Dot>();
-                dotScript.column = x;
-                dotScript.row = y;
-                dotScript.board = this;
-                dotScript.dotType = randomDot;
+                if (dotScript != null)
+                {
+                    dotScript.Init(x, y, this, randomDot);
+                }
 
                 // ensure consistent base scale
                 dot.transform.localScale = baseScale;
@@ -488,10 +488,10 @@ public class Board : MonoBehaviour
                     GameObject dot = Instantiate(dots[randomDot], spawnPos, Quaternion.identity, transform);
 
                     Dot dotScript = dot.GetComponent<Dot>();
-                    dotScript.column = x;
-                    dotScript.row = y;
-                    dotScript.board = this;
-                    dotScript.dotType = randomDot;
+                    if (dotScript != null)
+                    {
+                        dotScript.Init(x, y, this, randomDot);
+                    }
 
                     dot.transform.localScale = baseScale;
 

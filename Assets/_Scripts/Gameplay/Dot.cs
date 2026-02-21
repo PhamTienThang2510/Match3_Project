@@ -9,7 +9,13 @@ public class Dot : MonoBehaviour
 
     private Vector2 firstTouch;
     private Vector2 lastTouch;
-
+    public void Init(int column, int row, Board board, int dotType)
+    {
+        this.column = column;
+        this.row = row;
+        this.board = board;
+        this.dotType = dotType;
+    }
     private void OnMouseDown()
     {
         if (board == null || !board.CanMove) return;
