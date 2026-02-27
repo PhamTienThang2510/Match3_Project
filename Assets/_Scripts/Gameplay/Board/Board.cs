@@ -7,9 +7,9 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
     [Header("Board Settings")]
-    [SerializeField] private int width = 8;
-    [SerializeField] private int height = 8;
-    [SerializeField] private GameObject[] dots;
+    [SerializeField] public int width = 8;
+    [SerializeField] public int height = 8;
+    [SerializeField] public GameObject[] dots;
     [SerializeField] private float HintDelay = 5f;
     [SerializeField] private int maxShuffleAttempts = 10;
 
