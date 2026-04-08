@@ -86,7 +86,7 @@ public class Board : MonoBehaviour
                 GameObject dot = Instantiate(dots[randomDot], pos, Quaternion.identity, transform);
                 Dot dotScript = dot.GetComponent<Dot>();
                 if (dotScript != null)
-                {
+                {  
                     dotScript.Init(x, y, this, randomDot);
                 }
 
